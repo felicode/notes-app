@@ -18,11 +18,14 @@ func main() {
 	}
 	defer db.Close()
 
-	db.Exec(`CREATE TABLE IF NOT EXISTS notes
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS notes (
 									id INTEGER PRIMARY KEY AUTOINCREMENT,
 									title TEXT NOT NULL,
 									body TEXT NOT NULL
 		)`)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	h := &handler.NoteHandler{Store: &store.NoteStore{DB: db}}
 

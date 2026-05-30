@@ -3,8 +3,9 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"notes-app/store"
 	"strconv"
+
+	"notes-app/store"
 )
 
 type NoteHandler struct {
@@ -18,9 +19,9 @@ func (h *NoteHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewDecoder(r.Body).Decode(&body)
 
-	note, err := h.Store.create(body.Title, body.Body)
+	note, err := h.Store.Create(body.Title, body.Body)
 	if err != nil {
-		http.Error(w, error.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -45,7 +46,7 @@ func (h *NoteHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	var body struct {
 		Title string `json:"title"`
-		Body string `json:"body"`
+		Body  string `json:"body"`
 	}
 	json.NewDecoder(r.Body).Decode(&body)
 
@@ -57,10 +58,10 @@ func (h *NoteHandler) Update(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-fun (h *NoteHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (h *NoteHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(r.PathValue("id"), 10, 64)
 
-	if err != h.Store.Delete; err != nil {
+	if err := h.Store.Delete(id); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

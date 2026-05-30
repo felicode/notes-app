@@ -21,6 +21,7 @@ func (s *NoteStore) Create(title, body string) (model.Note, error) {
 }
 
 func (s *NoteStore) List() ([]model.Note, error) {
+	rows, err := s.DB.Query("SELECT id, title, body FROM notes")
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +30,7 @@ func (s *NoteStore) List() ([]model.Note, error) {
 	var notes []model.Note
 	for rows.Next() {
 		var n model.Note
-		rows.Scan(&n.Id, &n.Title, &n.Body)
+		rows.Scan(&n.ID, &n.Title, &n.Body)
 		notes = append(notes, n)
 	}
 	return notes, nil
@@ -42,4 +43,5 @@ func (s *NoteStore) Update(id int64, title, body string) error {
 
 func (s *NoteStore) Delete(id int64) error {
 	_, err := s.DB.Exec("DELETE FROM notes WHERE id=?", id)
+	return err
 }
