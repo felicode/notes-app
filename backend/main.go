@@ -4,12 +4,34 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"time"
 
 	"notes-app/handler"
 	"notes-app/store"
 
 	_ "modernc.org/sqlite"
 )
+
+// statusRecorder wraps http.ResponseWriter to capture the status code.
+type statusRecorder struct {
+	http.ResponseWriter
+	status int
+}
+
+func (r *statusRecorder) WriteHeader(code int) {
+	r.status = code
+	r.ResponseWriter.WriteHeader(code)
+}
+
+// logging logs methods, path, status and duration for every request.
+func logging(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		rec := &statusRecorder{ResponseWriter: w, status: http.StatusOK}
+		next.ServeHTTP(rec, r)
+		log.Printf("%s %s %d %s", r.Method, r.URL.Path, rec.status, time.Since(start))
+	})
+}
 
 func main() {
 	db, err := sql.Open("sqlite", "./notes.db")
@@ -36,5 +58,5 @@ func main() {
 	mux.HandleFunc("DELETE /notes/{id}", h.Delete)
 
 	log.Println("Server running on :8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	log.Fatal(http.ListenAndServe(":8080", logging(mux)))
 }
