@@ -1,0 +1,26 @@
+GET http://localhost:8080/notes
+Content-Type: application/json
+
+{
+    "title": "my note",
+    "body": "hello"
+}
+
+###
+
+POST http://localhost:8080/notes
+Content-Type: application/json
+
+{
+    "title":"My first note",
+    "body":"Hello world"
+}
+
+###
+
+PUT http://localhost:8080/notes/1
+Content-Type: application/json
+{
+    "title": "Updated title",
+    "body": "Updated body"
+}
